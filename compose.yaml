@@ -1,0 +1,12 @@
+services:
+  web:
+    build:
+      context: ./apps/web
+    ports:
+      - "127.0.0.1:3001:3000"
+    environment:
+      NEXT_TELEMETRY_DISABLED: "1"
+    init: true
+    volumes:
+      - ./apps/web/src:/app/src
+      - ./apps/web/public:/app/public
