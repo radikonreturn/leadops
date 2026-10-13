@@ -94,3 +94,29 @@ def test_deleting_a_lead_preserves_other_leads_for_the_same_company(db):
     delete_lead(shared_lead.id, db)
     assert db.query(Lead).count() == 0
     assert db.query(Company).count() == 0
+
+
+def test_dashboard_and_leads_endpoints_via_http_client(db):
+    from fastapi.testclient import TestClient
+    from app.main import app
+    from app.core.database import get_db
+
+    app.dependency_overrides[get_db] = lambda: db
+    try:
+        client = TestClient(app)
+        summary_res = client.get("/api/dashboard/summary")
+        assert summary_res.status_code == 200
+        assert summary_res.json() == {
+            "total_leads": 0,
+            "new_leads": 0,
+            "qualified_prospects": 0,
+            "follow_ups_pending": 0,
+            "recent_leads": [],
+        }
+
+        leads_res = client.get("/api/leads")
+        assert leads_res.status_code == 200
+        assert leads_res.json() == {"items": [], "industries": []}
+    finally:
+        app.dependency_overrides.clear()
+

@@ -5,7 +5,7 @@ import { join } from "node:path";
 const isWindows = process.platform === "win32";
 const apiDirectory = "apps/api";
 const webDirectory = "apps/web";
-const apiExecutable = isWindows ? ".venv/Scripts/uvicorn.exe" : ".venv/bin/uvicorn";
+const apiExecutable = isWindows ? join(".venv", "Scripts", "uvicorn.exe") : ".venv/bin/uvicorn";
 const apiPath = join(apiDirectory, apiExecutable);
 const apiOnly = process.argv.includes("--api-only");
 const processes = [];
@@ -37,5 +37,12 @@ function stop() {
 process.on("SIGINT", stop);
 process.on("SIGTERM", stop);
 
-start(apiExecutable, ["app.main:app", "--reload"], apiDirectory);
+const portArgIndex = process.argv.indexOf("--port");
+const port = portArgIndex !== -1 && process.argv[portArgIndex + 1] ? process.argv[portArgIndex + 1] : process.env.API_PORT;
+const uvicornArgs = ["app.main:app", "--reload"];
+if (port) {
+  uvicornArgs.push("--port", String(port));
+}
+
+start(apiExecutable, uvicornArgs, apiDirectory);
 if (!apiOnly) start(isWindows ? "npm.cmd" : "npm", ["run", "dev"], webDirectory);

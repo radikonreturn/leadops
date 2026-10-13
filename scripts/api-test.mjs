@@ -4,7 +4,7 @@ import { join } from "node:path";
 
 const isWindows = process.platform === "win32";
 const apiDirectory = "apps/api";
-const pythonExecutable = isWindows ? ".venv/Scripts/python.exe" : ".venv/bin/python";
+const pythonExecutable = isWindows ? join(".venv", "Scripts", "python.exe") : ".venv/bin/python";
 const pythonPath = join(apiDirectory, pythonExecutable);
 
 if (!existsSync(pythonPath)) {

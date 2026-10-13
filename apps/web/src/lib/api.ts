@@ -37,7 +37,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     const body = await response.json().catch(() => null);
     const detail = Array.isArray(body?.detail)
       ? body.detail.map((item: { msg?: string }) => item.msg).join(" ")
-      : body?.detail;
+      : body?.detail || (typeof body?.message === "string" ? body.message : undefined);
     throw new Error(detail || "Something went wrong. Please try again.");
   }
 
