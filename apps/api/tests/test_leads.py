@@ -11,6 +11,8 @@ from app.api.leads import (
     update_lead_status,
 )
 from app.main import health_check
+from app.models.company import Company
+from app.models.lead import Lead
 from app.schemas.lead import LeadCreate, LeadStatusUpdate, LeadUpdate
 
 
@@ -69,3 +71,26 @@ def test_lead_crud_search_filter_and_dashboard_metrics(db):
 def test_invalid_status_is_rejected():
     with pytest.raises(ValueError):
         LeadCreate(**lead_payload(status="Researching"))
+
+
+@pytest.mark.parametrize("field", ["company_name", "contact_name", "industry", "source"])
+def test_partial_update_rejects_blank_required_text(field):
+    with pytest.raises(ValueError):
+        LeadUpdate(**{field: "   "})
+
+
+def test_deleting_a_lead_preserves_other_leads_for_the_same_company(db):
+    created = create_lead(LeadCreate(**lead_payload()), db)
+    original_lead = db.get(Lead, created.id)
+    shared_lead = Lead(company=original_lead.company, status="Contacted", source="Manual")
+    db.add(shared_lead)
+    db.commit()
+
+    delete_lead(created.id, db)
+
+    assert db.get(Lead, shared_lead.id) is not None
+    assert db.query(Company).count() == 1
+
+    delete_lead(shared_lead.id, db)
+    assert db.query(Lead).count() == 0
+    assert db.query(Company).count() == 0

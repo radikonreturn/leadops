@@ -1,9 +1,10 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Literal, Optional
 from pydantic import BaseModel, ConfigDict, EmailStr, HttpUrl, field_validator
 
 
-LEAD_STATUSES = {"New", "Qualified", "Contacted", "Replied", "Won", "Lost"}
+LEAD_STATUSES = ("New", "Qualified", "Contacted", "Replied", "Won", "Lost")
+LeadStatus = Literal["New", "Qualified", "Contacted", "Replied", "Won", "Lost"]
 
 
 class LeadPayload(BaseModel):
@@ -13,24 +14,16 @@ class LeadPayload(BaseModel):
     email: Optional[EmailStr] = None
     industry: str
     source: str = "Manual"
-    status: str = "New"
+    status: LeadStatus = "New"
     notes: Optional[str] = None
 
-    @field_validator("company_name", "contact_name", "industry")
+    @field_validator("company_name", "contact_name", "industry", "source")
     @classmethod
     def require_text(cls, value: str) -> str:
         value = value.strip()
         if not value:
             raise ValueError("This field is required.")
         return value
-
-    @field_validator("status")
-    @classmethod
-    def validate_status(cls, value: str) -> str:
-        if value not in LEAD_STATUSES:
-            raise ValueError(f"Status must be one of: {', '.join(sorted(LEAD_STATUSES))}.")
-        return value
-
 
 class LeadCreate(LeadPayload):
     pass
@@ -43,26 +36,22 @@ class LeadUpdate(BaseModel):
     email: Optional[EmailStr] = None
     industry: Optional[str] = None
     source: Optional[str] = None
-    status: Optional[str] = None
+    status: Optional[LeadStatus] = None
     notes: Optional[str] = None
 
-    @field_validator("status")
+    @field_validator("company_name", "contact_name", "industry", "source")
     @classmethod
-    def validate_status(cls, value: Optional[str]) -> Optional[str]:
-        if value is not None and value not in LEAD_STATUSES:
-            raise ValueError(f"Status must be one of: {', '.join(sorted(LEAD_STATUSES))}.")
+    def require_text(cls, value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return value
+        value = value.strip()
+        if not value:
+            raise ValueError("This field is required.")
         return value
 
 
 class LeadStatusUpdate(BaseModel):
-    status: str
-
-    @field_validator("status")
-    @classmethod
-    def validate_status(cls, value: str) -> str:
-        if value not in LEAD_STATUSES:
-            raise ValueError(f"Status must be one of: {', '.join(sorted(LEAD_STATUSES))}.")
-        return value
+    status: LeadStatus
 
 
 class LeadResponse(BaseModel):
@@ -73,7 +62,7 @@ class LeadResponse(BaseModel):
     email: Optional[str] = None
     industry: str
     source: str
-    status: str
+    status: LeadStatus
     notes: Optional[str] = None
     created_at: datetime
     updated_at: datetime

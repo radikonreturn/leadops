@@ -8,6 +8,6 @@
     "setup:web": "npm --prefix apps/web ci",
     "build": "npm --prefix apps/web run build",
     "lint": "npm --prefix apps/web run lint",
-    "test:api": "cd apps/api && .venv/bin/python -m pytest tests"
+    "test:api": "node scripts/api-test.mjs"
   }
 }

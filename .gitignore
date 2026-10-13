@@ -4,5 +4,6 @@
 __pycache__/
 *.py[cod]
 apps/api/tests/*.db
+apps/api/tests/*.db-journal
 apps/web/.next/
 apps/web/node_modules/

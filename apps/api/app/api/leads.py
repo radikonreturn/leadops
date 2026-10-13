@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
@@ -13,6 +13,7 @@ from app.schemas.lead import (
     LeadCreate,
     LeadListResponse,
     LeadResponse,
+    LeadStatus,
     LeadStatusUpdate,
     LeadUpdate,
 )
@@ -52,7 +53,7 @@ def serialize_lead(lead: Lead) -> LeadResponse:
 @router.get("", response_model=LeadListResponse)
 def list_leads(
     search: Optional[str] = Query(default=None, max_length=120),
-    status_filter: Optional[str] = Query(default=None, alias="status"),
+    status_filter: Optional[LeadStatus] = Query(default=None, alias="status"),
     industry: Optional[str] = Query(default=None, max_length=100),
     db: Session = Depends(get_db),
 ) -> LeadListResponse:
@@ -116,7 +117,7 @@ def update_lead(lead_id: int, payload: LeadUpdate, db: Session = Depends(get_db)
             setattr(lead.company, company_fields[field], str(value) if value is not None else None)
         else:
             setattr(lead, field, value)
-    lead.updated_at = datetime.utcnow()
+    lead.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
     db.commit()
     db.refresh(lead)
     return serialize_lead(lead)
@@ -126,7 +127,7 @@ def update_lead(lead_id: int, payload: LeadUpdate, db: Session = Depends(get_db)
 def update_lead_status(lead_id: int, payload: LeadStatusUpdate, db: Session = Depends(get_db)) -> LeadResponse:
     lead = get_lead_or_404(db, lead_id)
     lead.status = payload.status
-    lead.updated_at = datetime.utcnow()
+    lead.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
     db.commit()
     db.refresh(lead)
     return serialize_lead(lead)
@@ -135,7 +136,11 @@ def update_lead_status(lead_id: int, payload: LeadStatusUpdate, db: Session = De
 @router.delete("/{lead_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_lead(lead_id: int, db: Session = Depends(get_db)) -> Response:
     lead = get_lead_or_404(db, lead_id)
-    db.delete(lead.company)
+    company = lead.company
+    db.delete(lead)
+    db.flush()
+    if db.query(Lead.id).filter(Lead.company_id == company.id).first() is None:
+        db.delete(company)
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 

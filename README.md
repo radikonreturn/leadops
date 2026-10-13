@@ -77,6 +77,12 @@ npm run dev
 
 ## Verification
 
+From the repository root, run the cross-platform API test command:
+
+```bash
+npm run test:api
+```
+
 Run backend tests from the activated API virtual environment:
 
 ```bash
