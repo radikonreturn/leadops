@@ -22,6 +22,22 @@ class Settings(BaseSettings):
         "http://127.0.0.1:8000",
     ]
 
+    # Security & Encryption
+    ENCRYPTION_KEY: str = Field(
+        default="leadops-encryption-key-32-chars-long!",
+        description="Key for encrypting stored credentials at rest"
+    )
+    SECRET_KEY: str = Field(
+        default="leadops-session-secret-key-change-me",
+        description="Key for signing session tokens"
+    )
+
+    # OAuth Settings
+    GOOGLE_OAUTH_CLIENT_ID: str = ""
+    GOOGLE_OAUTH_CLIENT_SECRET: str = ""
+    OPENROUTER_OAUTH_CLIENT_ID: str = ""
+    OAUTH_REDIRECT_BASE_URL: str = "http://localhost:3000"
+
     # AI Configuration
     AI_PROVIDER: str = "openai"  # openai, gemini, anthropic, ollama, mock
     OPENAI_API_KEY: str = ""

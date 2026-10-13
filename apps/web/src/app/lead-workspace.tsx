@@ -4,6 +4,7 @@ import {
   Building2,
   ChevronDown,
   Clock3,
+  Cpu,
   Eye,
   LayoutDashboard,
   LoaderCircle,
@@ -15,6 +16,7 @@ import {
   UsersRound,
   X,
 } from "lucide-react";
+import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { api, DashboardSummary, Lead, LeadPayload, LeadStatus, leadStatuses } from "@/lib/api";
 
@@ -173,7 +175,11 @@ export default function Home() {
     <main className="workspace">
       <aside className="sidebar">
         <div className="brand"><span className="brand-mark">L</span><span>leadops</span></div>
-        <nav aria-label="Main navigation"><a className="nav-link active" href="#dashboard"><LayoutDashboard size={18} />Overview</a><a className="nav-link" href="#leads"><UsersRound size={18} />Leads <span className="nav-count">{summary?.total_leads ?? 0}</span></a></nav>
+        <nav aria-label="Main navigation">
+          <a className="nav-link active" href="#dashboard"><LayoutDashboard size={18} />Overview</a>
+          <a className="nav-link" href="#leads"><UsersRound size={18} />Leads <span className="nav-count">{summary?.total_leads ?? 0}</span></a>
+          <Link className="nav-link" href="/settings/ai-providers"><Cpu size={18} />AI Providers</Link>
+        </nav>
         <div className="sidebar-foot"><div className="user-card"><div className="avatar">LO</div><div><strong>Local workspace</strong><span>Lead manager</span></div></div></div>
       </aside>
       <section className="content">

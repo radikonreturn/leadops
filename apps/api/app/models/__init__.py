@@ -7,6 +7,8 @@ from app.models.email import Email
 from app.models.campaign import Campaign
 from app.models.activity import Activity
 from app.models.user import User
+from app.models.ai_connection import UserAIConnection, UserAISettings
+from app.models.oauth_state import OAuthState
 
 __all__ = [
     "Base",
@@ -18,4 +20,7 @@ __all__ = [
     "Campaign",
     "Activity",
     "User",
+    "UserAIConnection",
+    "UserAISettings",
+    "OAuthState",
 ]

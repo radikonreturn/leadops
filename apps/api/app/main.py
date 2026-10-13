@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.auth import router as auth_router
+from app.api.ai_providers import router as ai_providers_router
 from app.api.leads import dashboard_router, router as leads_router
 from app.core.config import settings
 
@@ -20,5 +22,7 @@ def health_check() -> dict[str, str]:
     return {"status": "ok"}
 
 
+app.include_router(auth_router)
+app.include_router(ai_providers_router)
 app.include_router(leads_router)
 app.include_router(dashboard_router)
