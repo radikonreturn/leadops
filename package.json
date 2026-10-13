@@ -1,0 +1,13 @@
+{
+  "name": "leadops",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:api": "node scripts/dev.mjs --api-only",
+    "dev:web": "npm --prefix apps/web run dev",
+    "setup:web": "npm --prefix apps/web ci",
+    "build": "npm --prefix apps/web run build",
+    "lint": "npm --prefix apps/web run lint",
+    "test:api": "cd apps/api && .venv/bin/python -m pytest tests"
+  }
+}
