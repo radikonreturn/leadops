@@ -1,0 +1,8 @@
+.env
+.env.local
+.venv/
+__pycache__/
+*.py[cod]
+apps/api/tests/*.db
+apps/web/.next/
+apps/web/node_modules/

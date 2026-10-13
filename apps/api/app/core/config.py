@@ -1,7 +1,6 @@
-from typing import List, Union
+from typing import List
 from pydantic_settings import BaseSettings
 from pydantic import Field, field_validator
-import os
 
 
 class Settings(BaseSettings):
@@ -11,7 +10,7 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: str = Field(
-        default="postgresql://leadops:leadops123@localhost:5432/leadops",
+        default="postgresql://leadops:change-me@localhost:5432/leadops",
         description="Database connection URL"
     )
 
@@ -21,7 +20,6 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3000",
         "http://localhost:8000",
         "http://127.0.0.1:8000",
-        "*"
     ]
 
     # AI Configuration
